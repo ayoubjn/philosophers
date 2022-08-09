@@ -6,11 +6,11 @@
 /*   By: ajana <ajana@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/21 04:30:39 by ajana             #+#    #+#             */
-/*   Updated: 2022/08/02 18:56:39 by ajana            ###   ########.fr       */
+/*   Updated: 2022/08/09 22:43:48 by ajana            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 void	get_argv(char **av, t_args *args)
 {
@@ -24,39 +24,23 @@ void	get_argv(char **av, t_args *args)
 		args->num_of_meals = -1;
 }
 
-void	create_threads(t_args *args)
+void	*philos_init(t_args *args)
 {
 	int	i;
 
-	i = -1;
-	while (++i < args->num_of_philos)
-	{
-		pthread_create(&((args->philos_arr[i]).thread), NULL, routine, &(args->philos_arr[i]));
-		usleep(100);
-	}
-	i = -1;
-	while (++i < args->num_of_philos)
-		pthread_detach((args->philos_arr[i]).thread);
-}
-
-void	*philos_init(t_args *args)
-{
-	int		i;
-	t_philo	*philosopher;
-
 	i = 0;
+	args->forks = sem_open("forks", O_CREAT, 777, args->num_of_philos);
+	args->print_sem = sem_open("print_sem", O_CREAT, 777, 1);
 	gettimeofday(&(args->start), NULL);
-	pthread_mutex_init(&(args->p_lock), NULL);
-	pthread_mutex_init(&(args->wr_lock), NULL);
 	while (i < args->num_of_philos)
 	{
-		philosopher = &(args->philos_arr[i]);
-		pthread_mutex_init(&(philosopher->fork), NULL);
-		philosopher->id = i + 1;
-		philosopher->meals = args->num_of_meals;
-		philosopher->args = args;
+		(args->philos_arr[i]).id = i + 1;
+		(args->philos_arr[i]).meals = args->num_of_meals;
+		(args->philos_arr[i]).args = args;
+		(args->philos_arr[i]).pid = fork();
+		if ((args->philos_arr[i]).pid == 0)
+			routine(&(args->philos_arr[i]));
 		i++;
 	}
-	create_threads(args);
 	return (NULL);
 }
