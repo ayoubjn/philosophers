@@ -6,7 +6,7 @@
 /*   By: ajana <ajana@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:18:29 by ajana             #+#    #+#             */
-/*   Updated: 2022/08/07 21:34:10 by ajana            ###   ########.fr       */
+/*   Updated: 2022/08/16 00:09:38 by ajana            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct philo
 	int				id;
 	int				meals;
 	int				last_meal;
+	int				is_eating;
 	struct args		*args;
 } t_philo;
 
@@ -64,5 +65,6 @@ int		police_man(t_args *args);
 void	msleep(int time_ms);
 void	*routine(void *a);
 void	ft_usleep(unsigned long time);
+int		read_lock(int var, pthread_mutex_t *lock);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ajana <ajana@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/21 04:38:09 by ajana             #+#    #+#             */
-/*   Updated: 2022/08/09 22:39:13 by ajana            ###   ########.fr       */
+/*   Updated: 2022/08/23 06:11:40 by ajana            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,27 @@ void	msleep(int time_ms)
 		usleep(100);
 }
 
+sem_t	*open_sem(const char *name, int value)
+{
+	sem_t	*sem;
+
+	sem = sem_open(name, O_CREAT | O_EXCL, 777, value);
+	if (sem == SEM_FAILED)
+	{
+		sem_unlink(name);
+		sem = sem_open(name, O_CREAT, 777, value);
+	}
+	return (sem);
+}
+
 void	print_lock(t_philo *philo, char *msg)
 {
 	int	time;
 
 	time = get_time(philo->args->start);
-	if (sem_wait(philo->args->print_sem))
-		return ;
+	sem_wait(philo->args->print_sem);
 	printf(WHT "%d %d %s" reset, time, philo->id, msg);
-	if (sem_post(philo->args->print_sem))
-		return ;
+	// aywa
+	if (strcmp(msg, RED "died\n" reset))
+		sem_post(philo->args->print_sem);
 }

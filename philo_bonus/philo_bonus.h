@@ -6,7 +6,7 @@
 /*   By: ajana <ajana@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 17:18:29 by ajana             #+#    #+#             */
-/*   Updated: 2022/08/09 22:36:08 by ajana            ###   ########.fr       */
+/*   Updated: 2022/08/23 05:58:51 by ajana            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <semaphore.h>
 # include <string.h>
 # include <signal.h>
+# include <sys/wait.h>
 
 # define reset "\e[0m"
 # define RED "\e[0;31m"
@@ -34,9 +35,11 @@ struct args;
 
 typedef struct philo
 {
+	pthread_t		doctor;
 	int				id;
 	int				meals;
 	int				last_meal;
+	int				is_eating;
 	int				pid;
 	struct args		*args;
 } t_philo;
@@ -51,6 +54,7 @@ typedef	struct args
 	t_philo			*philos_arr;
 	sem_t			*forks;
 	sem_t			*print_sem;
+	sem_t			*died;
 	struct timeval	start;
 } t_args;
 
@@ -59,10 +63,11 @@ void	get_argv(char **av, t_args *args);
 void	print_lock(t_philo *philo, char *msg);
 int		get_time(struct timeval start);
 void	mutex_destroy(t_args *args);
-void	*philos_init(t_args *args);
-int		police_man(t_args *args);
+void	philos_init(t_args *args);
 void	msleep(int time_ms);
 void	routine(t_philo *philo);
 void	ft_usleep(unsigned long time);
+sem_t	*open_sem(const char *name, int value);
+void	*finish(void *arg);
 
 #endif

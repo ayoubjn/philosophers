@@ -6,7 +6,7 @@
 /*   By: ajana <ajana@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/21 04:30:39 by ajana             #+#    #+#             */
-/*   Updated: 2022/08/09 22:43:48 by ajana            ###   ########.fr       */
+/*   Updated: 2022/08/23 06:12:57 by ajana            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 void	get_argv(char **av, t_args *args)
 {
+	// aywa
 	args->num_of_philos = atoi(av[1]);
 	args->time_to_die = atoi(av[2]);
 	args->time_to_eat = atoi(av[3]);
@@ -24,23 +25,36 @@ void	get_argv(char **av, t_args *args)
 		args->num_of_meals = -1;
 }
 
-void	*philos_init(t_args *args)
+void	parent_wait(t_args *args)
 {
 	int	i;
 
+	i = -1;
+	while (++i < args->num_of_philos)
+		waitpid((args->philos_arr[i]).pid, NULL, 0);
+}
+
+void	philos_init(t_args *args)
+{
+	int			i;
+	pthread_t	thread;
+
 	i = 0;
-	args->forks = sem_open("forks", O_CREAT, 777, args->num_of_philos);
-	args->print_sem = sem_open("print_sem", O_CREAT, 777, 1);
+	args->print_sem = open_sem("print_sem", 1);
+	args->forks = open_sem("forks", args->num_of_philos);
+	args->died = open_sem("died", 0);
 	gettimeofday(&(args->start), NULL);
+	pthread_create(&thread, NULL, finish, args);
 	while (i < args->num_of_philos)
 	{
 		(args->philos_arr[i]).id = i + 1;
 		(args->philos_arr[i]).meals = args->num_of_meals;
 		(args->philos_arr[i]).args = args;
+		((args->philos_arr[i]).last_meal) = 0;
 		(args->philos_arr[i]).pid = fork();
 		if ((args->philos_arr[i]).pid == 0)
 			routine(&(args->philos_arr[i]));
 		i++;
 	}
-	return (NULL);
+	parent_wait(args);
 }

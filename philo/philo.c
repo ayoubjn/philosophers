@@ -6,11 +6,21 @@
 /*   By: ajana <ajana@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 16:25:39 by ajana             #+#    #+#             */
-/*   Updated: 2022/08/10 00:03:24 by ajana            ###   ########.fr       */
+/*   Updated: 2022/08/15 22:50:04 by ajana            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+int	read_lock(int var, pthread_mutex_t *lock)
+{
+	int	value;
+
+	pthread_mutex_lock(lock);
+	value = var;
+	pthread_mutex_unlock(lock);
+	return (value);
+}
 
 void	write_lock(int *var, int value, pthread_mutex_t *lock)
 {
@@ -41,7 +51,9 @@ int	eat(t_philo *philo, t_philo *next_philo)
 	print_lock(philo, BLU "has taken a fork\n" reset);
 	print_lock(philo, GRN "is eating\n" reset);
 	write_lock(&(philo->last_meal), get_time(args->start), &(args->wr_lock));
+	write_lock(&(philo->is_eating), 1, &args->wr_lock);
 	msleep(args->time_to_eat);
+	write_lock(&(philo->is_eating), 0, &args->wr_lock);
 	if (pthread_mutex_unlock(&(philo->fork)))
 		return (0);
 	if (pthread_mutex_unlock(&(next_philo->fork)))
@@ -60,9 +72,9 @@ void	*routine(void *a)
 	i = philo->id;
 	args = philo->args;
 	next_philo = &(args->philos_arr[i % (args->num_of_philos)]);
-	while (philo->meals && eat(philo, next_philo))
+	while (eat(philo, next_philo))
 	{
-		(philo->meals)--;
+		write_lock(&philo->meals, philo->meals - 1, &args->wr_lock);
 		sleep_think(philo);
 	}
 	return (NULL);
