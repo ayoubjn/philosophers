@@ -6,33 +6,23 @@
 /*   By: ajana <ajana@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/21 04:30:39 by ajana             #+#    #+#             */
-/*   Updated: 2022/08/15 02:49:27 by ajana            ###   ########.fr       */
+/*   Updated: 2022/08/29 10:43:04 by ajana            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	get_argv(char **av, t_args *args)
-{
-	args->num_of_philos = atoi(av[1]);
-	args->time_to_die = atoi(av[2]);
-	args->time_to_eat = atoi(av[3]);
-	args->time_to_sleep = atoi(av[4]);
-	if (av[5])
-		args->num_of_meals = atoi(av[5]);
-	else
-		args->num_of_meals = -1;
-}
-
-void	create_threads(t_args *args)
+void	create_threads(t_args *args, t_philo *philos_arr)
 {
 	int	i;
 
 	i = -1;
+	gettimeofday(&(args->start), NULL);
 	while (++i < args->num_of_philos)
 	{
-		pthread_create(&((args->philos_arr[i]).thread), NULL, routine, &(args->philos_arr[i]));
-		usleep(100);
+		pthread_create(&(philos_arr[i].thread), NULL, routine, &philos_arr[i]);
+		pthread_detach((args->philos_arr[i]).thread);
+		usleep(10);
 	}
 }
 
@@ -42,7 +32,6 @@ void	*philos_init(t_args *args)
 	t_philo	*philosopher;
 
 	i = 0;
-	gettimeofday(&(args->start), NULL);
 	pthread_mutex_init(&(args->p_lock), NULL);
 	pthread_mutex_init(&(args->wr_lock), NULL);
 	while (i < args->num_of_philos)
@@ -54,6 +43,6 @@ void	*philos_init(t_args *args)
 		philosopher->args = args;
 		i++;
 	}
-	create_threads(args);
+	create_threads(args, args->philos_arr);
 	return (NULL);
 }

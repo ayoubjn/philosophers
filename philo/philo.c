@@ -6,78 +6,63 @@
 /*   By: ajana <ajana@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/27 16:25:39 by ajana             #+#    #+#             */
-/*   Updated: 2022/08/15 22:50:04 by ajana            ###   ########.fr       */
+/*   Updated: 2022/08/29 19:09:04 by ajana            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	read_lock(int var, pthread_mutex_t *lock)
+int	death_cond(t_args *args, t_philo *philo)
 {
-	int	value;
+	int	hunger;
+	int	cond;
 
-	pthread_mutex_lock(lock);
-	value = var;
-	pthread_mutex_unlock(lock);
-	return (value);
+	cond = 0;
+	pthread_mutex_lock(&args->wr_lock);
+	hunger = get_time(args->start) - philo->last_meal;
+	if (philo->meals == 0)
+		cond = 2;
+	if ((hunger >= args->time_to_die) && (!philo->is_eating))
+		cond = 1;
+	pthread_mutex_unlock(&args->wr_lock);
+	return (cond);
 }
 
-void	write_lock(int *var, int value, pthread_mutex_t *lock)
+int	police_man(t_args *args)
 {
-	if (pthread_mutex_lock(lock))
-		return ;
-	*var = value;
-	if (pthread_mutex_unlock(lock))
-		return ;
-}
+	int	i;
+	int	count;
+	int	check;
 
-void	sleep_think(t_philo *philo)
-{
-	print_lock(philo, GRN "is sleeping\n" reset);
-	msleep(philo->args->time_to_sleep);
-	print_lock(philo, GRN "is thinking\n" reset);
-}
-
-int	eat(t_philo *philo, t_philo *next_philo)
-{
-	t_args	*args;
-
-	args = philo->args;
-	if (pthread_mutex_lock(&(philo->fork)))
-		return (0);
-	print_lock(philo, BLU "has taken a fork\n" reset);
-	if (pthread_mutex_lock(&(next_philo->fork)))
-		return (0);
-	print_lock(philo, BLU "has taken a fork\n" reset);
-	print_lock(philo, GRN "is eating\n" reset);
-	write_lock(&(philo->last_meal), get_time(args->start), &(args->wr_lock));
-	write_lock(&(philo->is_eating), 1, &args->wr_lock);
-	msleep(args->time_to_eat);
-	write_lock(&(philo->is_eating), 0, &args->wr_lock);
-	if (pthread_mutex_unlock(&(philo->fork)))
-		return (0);
-	if (pthread_mutex_unlock(&(next_philo->fork)))
-		return (0);
-	return (1);
-}
-
-void	*routine(void *a)
-{
-	int		i;
-	t_philo	*philo;
-	t_args	*args;
-	t_philo	*next_philo;
-
-	philo = (t_philo *)a;
-	i = philo->id;
-	args = philo->args;
-	next_philo = &(args->philos_arr[i % (args->num_of_philos)]);
-	while (eat(philo, next_philo))
+	i = 0;
+	count = 0;
+	check = 0;
+	while (i < args->num_of_philos)
 	{
-		write_lock(&philo->meals, philo->meals - 1, &args->wr_lock);
-		sleep_think(philo);
+		check = death_cond(args, &(args->philos_arr[i]));
+		if (check == 1)
+		{
+			print_lock(&(args->philos_arr[i]), RED "died\n");
+			mutex_destroy(args);
+			return (args->num_of_philos);
+		}
+		else if (check == 2)
+			count++;
+		i++;
 	}
-	return (NULL);
+	return (count);
+}
+
+void	get_argv(char **av, t_args *args)
+{
+	args->num_of_philos = atoi(av[1]);
+	args->time_to_die = atoi(av[2]);
+	args->time_to_eat = atoi(av[3]);
+	args->time_to_sleep = atoi(av[4]);
+	if (av[5])
+		args->num_of_meals = atoi(av[5]);
+	else
+		args->num_of_meals = -1;
 }
 
 t_args	*allocate_and_init(char **av)
@@ -105,7 +90,8 @@ int	main(int ac, char **av)
 	if (!args)
 		return (0);
 	philos_init(args);
-	while (police_man(args));
+	while (police_man(args) < args->num_of_philos)
+		;
 	free(args);
 	return (0);
 }

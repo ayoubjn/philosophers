@@ -7,8 +7,10 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
  
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Tue Aug 23 07:05:50 2022
+
+# Make data base, printed on Mon Aug 29 19:01:23 2022
 
 # Variables
 
@@ -35,9 +37,9 @@ MAKEFILE_LIST :=
 # environment
 VSCODE_CWD = /
 # environment
-Apple_PubSub_Socket_Render = /private/tmp/com.apple.launchd.2Fcs4VBJqN/Render
+Apple_PubSub_Socket_Render = /private/tmp/com.apple.launchd.lSIZ4HDqOU/Render
 # environment
-PATH = /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/munki
+PATH = /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/munki:/Library/Frameworks/Mono.framework/Versions/Current/Commands
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
@@ -45,7 +47,7 @@ ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.Efz6o9kMgc/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.jB8jzUj7bm/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -62,9 +64,6 @@ MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 VSCODE_CODE_CACHE_PATH = /Users/ajana/Library/Application Support/Code/CachedData/e4503b30fc78200f846c62cf8091b76ff5547662
 # environment
 LOGNAME = ajana
- 
-make: *** No rule to make target `all'.  Stop.
-
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
@@ -110,13 +109,15 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = com.microsoft.VSCode.1772
+XPC_SERVICE_NAME = com.apple.xpc.launchd.oneshot.0x1000002b.Electron
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
 +F = $(notdir $+)
 # environment
 __CF_USER_TEXT_ENCODING = 0x112A:0x0:0x0
+# environment
+COMMAND_MODE = unix2003
 # default
 MAKEFILES := 
 # automatic
@@ -125,6 +126,8 @@ MAKEFILES :=
 PAGER = less
 # environment
 LC_ALL = C
+# environment
+SECURITYSESSIONID = 18895
 # automatic
 ^F = $(notdir $^)
 # default
@@ -136,9 +139,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 7017
+VSCODE_PID = 98440
 # variable set hash-table stats:
-# Load=61/1024=6%, Rehash=0, Collisions=1/82=1%
+# Load=63/1024=6%, Rehash=0, Collisions=1/84=1%
 
 # Pattern-specific Variable Values
 
@@ -146,9 +149,9 @@ VSCODE_PID = 7017
 
 # Directories
 
-# . (device 16777227, inode 2688190): 6 files, no impossibilities.
+# . (device 16777227, inode 2688190): 7 files, no impossibilities.
 
-# 6 files, no impossibilities in 1 directories.
+# 7 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -220,6 +223,6 @@ GNUmakefile:
 # strcache size: total = 0 / max = 0 / min = 4096 / avg = 0
 # strcache free: total = 0 / max = 0 / min = 4096 / avg = 0
 
-# Finished Make data base on Tue Aug 23 07:05:50 2022
+# Finished Make data base on Mon Aug 29 19:01:23 2022
 
  
